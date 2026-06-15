@@ -1,8 +1,8 @@
 # gcscreen — Kinetic Growth-Curve Analysis for 96-Well Phenotypic Screens
 
-[![R-CMD-check](https://github.com/[OWNER]/gcscreen/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/[OWNER]/gcscreen/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/mparmol/gcscreen/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mparmol/gcscreen/actions/workflows/R-CMD-check.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.[CONCEPT_DOI].svg)](https://doi.org/10.5281/zenodo.[CONCEPT_DOI])
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20702376.svg)](https://doi.org/10.5281/zenodo.20702376)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 
 `gcscreen` is an R package implementing a complete, reproducible
@@ -38,7 +38,7 @@ summary statistic for this assay format.
 
 ```r
 # Install from GitHub
-remotes::install_github("[OWNER]/gcscreen")
+remotes::install_github("mparmol/gcscreen")
 
 # Or, after cloning locally:
 devtools::install("path/to/gcscreen")
@@ -100,11 +100,11 @@ companion paper:
 
 - **Package**: Parras-Moltó M (2026). *gcscreen: Kinetic growth-curve
   analysis for 96-well phenotypic screens*. R package version
-  0.1.0. doi:10.5281/zenodo.[CONCEPT_DOI].
+  0.1.0. doi:10.5281/zenodo.20702376.
 - **Paper**: Parras-Moltó M, García-Ríos E (2026). *Triangulating
   compound effects in 96-well growth-curve phenotypic screens: a
   benchmarked, simulation-validated pipeline*. PLOS Computational
-  Biology (in submission). doi:10.5281/zenodo.[PAPER_CONCEPT_DOI].
+  Biology (in submission). doi:10.5281/zenodo.20702473.
 
 A `CITATION.cff` file is provided for automatic citation tools
 (GitHub "Cite this repository" button, Zotero, etc.).
@@ -116,13 +116,26 @@ session info under which the companion paper analyses were run is
 deposited in the [paper repository][paper-repo] under
 `environment/sessionInfo.txt`.
 
-[paper-repo]: https://github.com/[OWNER]/prestwick-yeast-screen
+[paper-repo]: https://github.com/mparmol/prestwick-yeast-screen
 
 ## Contributing
 
 Issues and pull requests welcome. Please run
 `devtools::check()` and ensure `R CMD check --as-cran` passes
 (0 errors / 0 warnings) before opening a PR.
+
+## Authors
+
+- **Marcos Parras-Moltó** (creator and maintainer) —
+  mparmol@gmail.com — ORCID
+  [0000-0003-0529-627X](https://orcid.org/0000-0003-0529-627X) —
+  Leitat Technological Center, Applied Microbiology and
+  Biotechnologies, Barcelona, Spain.
+- **Estéfani García-Ríos** (co-author of the companion paper) —
+  egarcia@icvv.es — ORCID
+  [0000-0001-9028-055X](https://orcid.org/0000-0001-9028-055X) —
+  Instituto de Ciencias de la Vid y del Vino (CSIC, Universidad
+  de La Rioja, Gobierno de La Rioja), Logroño 26007, Spain.
 
 ## License
 
