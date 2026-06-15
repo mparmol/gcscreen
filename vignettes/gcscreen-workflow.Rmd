@@ -1,0 +1,215 @@
+---
+title: "gcscreen: Complete workflow for 96-well kinetic phenotypic screens"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{gcscreen: Complete workflow for 96-well kinetic phenotypic screens}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+## Overview
+
+`gcscreen` implements a validated pipeline for phenotypic screening using
+OD600 kinetic growth curves in 96-well plates. The pipeline comprises:
+
+1. Trapezoidal AUC calculation with baseline correction
+2. B-score positional-bias correction (median polish)
+3. Normalisation to the plate-run control median
+4. Plate quality metrics: CV, Z'-factor, SSMD, robust Z'-factor
+5. Per-compound ANOVA and linear mixed model (LMM, plate as random effect)
+6. Benjamini-Hochberg FDR, dual-convergence hit calling
+
+## Input data format
+
+Each plate-run is a data frame with columns:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `run` | character | Plate-run identifier |
+| `plate` | integer | Plate number |
+| `well_pos` | integer | Well position 1–96 (row-major) |
+| `time` | numeric | Time in hours |
+| `od` | numeric | OD600 measurement |
+| `Chemical` | character | Compound name or `"CONTROL"` |
+
+A standard 96-well layout has controls in columns 1 and 12 (wells 1, 13, 25,
+37, 49, 61, 73, 85, 12, 24, 36, 48, 60, 72, 84, 96) and compounds in columns
+2–11 (80 wells per plate-run).
+
+## Quick start: `run_screen()`
+
+The simplest way to use `gcscreen` is the high-level `run_screen()` wrapper.
+Because it fits a LMM per compound, it may take a few minutes on a full screen.
+
+```{r quickstart, eval = FALSE}
+library(gcscreen)
+data(example_screen)
+
+res <- run_screen(
+  platerun_list = example_screen,
+  time_max      = 60,
+  fdr_threshold = 0.05,
+  auc_rel_max   = 0.99
+)
+
+# Confirmed hits (ANOVA ∩ LMM, FDR < 0.05)
+res$hits[, c("Chemical", "AUC_rel", "FDR", "FDR_lmm")]
+```
+
+```
+#> Chemical     AUC_rel   FDR     FDR_lmm
+#> Cycloheximide  0.039  <0.001  <0.001
+#> Thimerosal     0.062  <0.001  <0.001
+#> Lanoconazole   0.127  <0.001  <0.001
+#> ...
+```
+
+## Step-by-step usage
+
+### 1. Well layout utilities
+
+```{r layout}
+library(gcscreen)
+
+# Map well positions to row/column indices
+well_to_rowcol(c(1L, 12L, 13L, 96L))
+```
+
+### 2. AUC calculation
+
+```{r auc}
+data(example_screen)
+run_df <- example_screen[["placa_2_rep_A"]]
+
+# Select one well, sort by time, baseline-correct, compute AUC
+w1 <- run_df[run_df$well_pos == 13L, ]   # a control well (col 1, row 2)
+w1 <- w1[order(w1$time), ]
+od_corr <- w1$od - w1$od[1L]
+od_corr[od_corr < 0] <- 0
+
+auc_val <- auc_trapz(w1$time, od_corr)
+cat("AUC for well 13:", round(auc_val, 3), "\n")
+```
+
+### 3. B-score positional-bias correction
+
+```{r bscore}
+# Simulate a plate-run AUC vector with a row gradient
+set.seed(42)
+wpos    <- 1:96
+rc      <- well_to_rowcol(wpos)
+auc_raw <- rnorm(96, mean = 40, sd = 2) + rc$row_idx * 1.5
+
+auc_corr <- bscore_plate(wpos, auc_raw)
+
+# Row-AUC correlation in compound wells before and after correction
+cmpd_idx <- which(rc$col_idx %in% 2:11)
+cat("Pearson r(row, AUC) before B-score:",
+    round(cor(rc$row_idx[cmpd_idx], auc_raw[cmpd_idx]),  3), "\n")
+cat("Pearson r(row, AUC) after  B-score:",
+    round(cor(rc$row_idx[cmpd_idx], auc_corr[cmpd_idx]), 3), "\n")
+```
+
+### 4. Plate quality assessment
+
+```{r qc}
+# Compute AUC for all control wells of one plate-run
+ctrl_df <- run_df[run_df$Chemical == "CONTROL", ]
+ctrl_auc <- tapply(seq_len(nrow(ctrl_df)), ctrl_df$well_pos, function(idx) {
+  sub <- ctrl_df[idx, ]
+  sub <- sub[order(sub$time), ]
+  od  <- sub$od - sub$od[1L]; od[od < 0] <- 0
+  auc_trapz(sub$time, od)
+})
+
+qc <- plate_qc(as.numeric(ctrl_auc), cv_warn = 20)
+cat(sprintf("CV: %.1f%%  |  flag: %s\n", qc$cv, qc$cv_flag))
+```
+
+### 5. Normalisation
+
+```{r normalize}
+# Normalise compound AUC to the control median
+ctrl_vec <- as.numeric(ctrl_auc)
+cmpd_vec <- c(2.1, 18.4, 35.0, 38.9)   # example values
+auc_rel  <- normalize_controls(cmpd_vec, ctrl_vec)
+cat("AUC_rel:", round(auc_rel, 3), "\n")
+```
+
+### 6. Per-compound statistics (single compound)
+
+```{r stats-single}
+# ANOVA: 3 compound replicates vs 48 control replicates (3 plate-runs × 16)
+ctrl_all <- rnorm(48, mean = 40, sd = 3)
+cmpd_obs <- c(4.2, 3.8, 4.5)            # a strong inhibitor
+pval <- screen_anova(cmpd_obs, ctrl_all)
+cat("ANOVA p-value:", format(pval, digits = 3), "\n")
+```
+
+### 7. Full statistical screen and hit calling
+
+Running `run_anova_screen()` and `run_lmm_screen()` on a full screen is
+computationally intensive. The code below is correct but not evaluated in the
+vignette to keep build times short.
+
+```{r full-screen, eval = FALSE}
+data(example_screen)
+res <- run_screen(example_screen)
+
+# Inspect QC table
+head(res$qc)
+
+# Top hits by ANOVA FDR
+head(res$anova_results)
+
+# Confirmed hits (ANOVA ∩ LMM)
+res$hits
+```
+
+### 8. Manual hit calling
+
+If you have pre-computed ANOVA and LMM result tables you can call hits
+directly:
+
+```{r hit-calling, eval = FALSE}
+hits <- call_hits(
+  anova_res     = res$anova_results,
+  lmm_res       = res$lmm_results,
+  fdr_threshold = 0.05,
+  auc_rel_max   = 0.99,
+  exclude       = "Chicago sky blue 6B"   # optical artefact
+)
+```
+
+## Interpreting results
+
+| Column | Meaning |
+|--------|---------|
+| `AUC_rel` | Mean relative AUC (compound / control median). < 1 = growth inhibition. |
+| `FDR` | BH-FDR from ANOVA. |
+| `FDR_lmm` | BH-FDR from LMM (plate as random effect). Both must be < `fdr_threshold`. |
+
+## Plate layout conventions
+
+The default layout assumes controls in columns 1 and 12 (`ctrl_cols = c(1, 12)`)
+and compounds in columns 2–11. Pass a different `ctrl_cols` to `bscore_plate()`
+and `run_screen()` to accommodate alternative layouts.
+
+## References
+
+- Zhang J-H, Chung TDY, Oldenburg KR (1999). A Simple Statistical Parameter
+  for Use in Evaluation and Validation of High Throughput Screening Assays.
+  *J Biomol Screen* 4(2):67–73.
+- Zhang XD (2007). A pair of new statistical parameters for quality control in
+  RNA interference high-throughput screening assays. *Genomics* 89(4):552–61.
+- Bates D et al. (2015). Fitting Linear Mixed-Effects Models Using lme4.
+  *J Stat Softw* 67(1):1–48.

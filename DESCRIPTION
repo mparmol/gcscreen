@@ -1,0 +1,31 @@
+Package: gcscreen
+Title: Kinetic Growth Curve Analysis for 96-Well Phenotypic Screens
+Version: 0.1.0
+Authors@R:
+    person("Marcos", "Parras-Moltó", email = "mparmol@gmail.com",
+           role = c("aut", "cre"))
+Description: Provides a complete pipeline for phenotypic screening using OD600
+    kinetic growth curves in 96-well plates. Implements trapezoidal AUC
+    calculation, B-score positional-bias correction (median polish), control
+    normalization, plate quality metrics (CV, Z'-factor, SSMD, robust
+    Z'-factor), per-compound ANOVA and linear mixed-model testing with plate
+    as a random effect, and Benjamini-Hochberg FDR-based hit calling.
+    Designed for Saccharomyces cerevisiae high-throughput screens but
+    applicable to any kinetic OD-based 96-well assay.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    lmerTest (>= 3.1-0),
+    stats
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    ggplot2
+VignetteBuilder: knitr
+Config/testthat/edition: 3

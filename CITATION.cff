@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "gcscreen: Kinetic Growth-Curve Analysis for 96-Well Phenotypic Screens"
+version: "0.1.0"
+date-released: 2026-05-XX
+type: software
+authors:
+  - family-names: Parras-Moltó
+    given-names: Marcos
+    email: mparmol@gmail.com
+    orcid: "https://orcid.org/[ORCID — TO COMPLETE]"
+    affiliation: "[Affiliation — TO COMPLETE]"
+  - family-names: García-Ríos
+    given-names: Estéfani
+    orcid: "https://orcid.org/[ORCID — TO COMPLETE]"
+    affiliation: "[Affiliation — TO COMPLETE]"
+identifiers:
+  - description: "Concept DOI (always points to latest version)"
+    type: doi
+    value: "10.5281/zenodo.[CONCEPT_DOI]"
+  - description: "Version DOI (v0.1.0)"
+    type: doi
+    value: "10.5281/zenodo.[VERSION_DOI]"
+repository-code: "https://github.com/[OWNER]/gcscreen"
+url: "https://github.com/[OWNER]/gcscreen"
+license: MIT
+keywords:
+  - phenotypic screening
+  - high-throughput screening
+  - growth curve
+  - OD600
+  - Saccharomyces cerevisiae
+  - B-score
+  - linear mixed model
+  - false discovery rate
+  - R package
+preferred-citation:
+  type: article
+  title: "Triangulating compound effects in 96-well growth-curve phenotypic screens: a benchmarked, simulation-validated pipeline combining within-plate B-score correction, median-of-controls normalisation and linear mixed modelling"
+  authors:
+    - family-names: Parras-Moltó
+      given-names: Marcos
+    - family-names: García-Ríos
+      given-names: Estéfani
+  journal: "PLOS Computational Biology"
+  year: 2026
+  doi: "[PAPER DOI — TO COMPLETE ON ACCEPTANCE]"
