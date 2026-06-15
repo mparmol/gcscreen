@@ -11,6 +11,13 @@ authors:
 repository-code: "https://github.com/mparmol/gcscreen"
 url: "https://github.com/mparmol/gcscreen"
 license: MIT
+identifiers:
+  - description: "Concept DOI (all versions)"
+    type: doi
+    value: "10.5281/zenodo.20702376"
+  - description: "Version DOI (v0.1.0)"
+    type: doi
+    value: "10.5281/zenodo.20702377"
 keywords:
   - phenotypic screening
   - high-throughput screening
