@@ -2,27 +2,14 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "gcscreen: Kinetic Growth-Curve Analysis for 96-Well Phenotypic Screens"
 version: "0.1.0"
-date-released: 2026-05-XX
+date-released: 2026-06-15
 type: software
 authors:
   - family-names: Parras-Moltó
     given-names: Marcos
     email: mparmol@gmail.com
-    orcid: "https://orcid.org/[ORCID — TO COMPLETE]"
-    affiliation: "[Affiliation — TO COMPLETE]"
-  - family-names: García-Ríos
-    given-names: Estéfani
-    orcid: "https://orcid.org/[ORCID — TO COMPLETE]"
-    affiliation: "[Affiliation — TO COMPLETE]"
-identifiers:
-  - description: "Concept DOI (always points to latest version)"
-    type: doi
-    value: "10.5281/zenodo.[CONCEPT_DOI]"
-  - description: "Version DOI (v0.1.0)"
-    type: doi
-    value: "10.5281/zenodo.[VERSION_DOI]"
-repository-code: "https://github.com/[OWNER]/gcscreen"
-url: "https://github.com/[OWNER]/gcscreen"
+repository-code: "https://github.com/mparmol/gcscreen"
+url: "https://github.com/mparmol/gcscreen"
 license: MIT
 keywords:
   - phenotypic screening
@@ -44,4 +31,3 @@ preferred-citation:
       given-names: Estéfani
   journal: "PLOS Computational Biology"
   year: 2026
-  doi: "[PAPER DOI — TO COMPLETE ON ACCEPTANCE]"
